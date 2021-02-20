@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../models/transaction.dart';
 import 'package:intl/intl.dart';
+
+import '../models/transaction.dart';
+import 'adaptive_flat_button.dart';
 
 class NewTransaction extends StatefulWidget {
   final Function addTransaction;
@@ -40,7 +45,7 @@ class _NewTransactionState extends State<NewTransaction> {
   }
 
   void _presentDatePicker() {
-    showDatePicker(
+     showDatePicker(
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(2021),
@@ -70,12 +75,21 @@ class _NewTransactionState extends State<NewTransaction> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                TextField(
+                Platform.isIOS ? CupertinoTextField(
+                  placeholder: 'Title',
+                  onSubmitted: (_) => _submitData(),
+                  controller: _titleController,
+                ) : TextField(
                   decoration: InputDecoration(labelText: 'Title'),
                   onSubmitted: (_) => _submitData(),
                   controller: _titleController,
                 ),
-                TextField(
+                Platform.isIOS ? CupertinoTextField(
+                  placeholder: 'Amount',
+                  onSubmitted: (_) => _submitData(),
+                  controller: _amountController,
+                    keyboardType: TextInputType.number,
+                ) : TextField(
                   decoration: InputDecoration(labelText: 'Amount'),
                   keyboardType: TextInputType.number,
                   onSubmitted: (_) => _submitData(),
@@ -92,24 +106,11 @@ class _NewTransactionState extends State<NewTransaction> {
                             ? 'No Date Chosen'
                             : DateFormat().add_yMMMd().format(_selectedDate)),
                       ),
-                      FlatButton(
-                          textColor: Theme.of(context).primaryColor,
-                          onPressed: _presentDatePicker,
-                          child: Text(
-                            'Choose date',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ))
+                      AdaptiveFlatButton('Choose date', _presentDatePicker, context , false),
                     ],
                   ),
                 ),
-                RaisedButton(
-                  onPressed: () {
-                    _submitData();
-                  },
-                  child: Text('Add Transaction'),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Theme.of(context).textTheme.button.color,
-                )
+                AdaptiveFlatButton('Add Transaction', _submitData, context , true),
               ],
             ),
           )),
